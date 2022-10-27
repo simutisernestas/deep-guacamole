@@ -25,4 +25,5 @@
     },
     "terminal.integrated.defaultProfile.linux": "bash"
   },
+  "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}"
 }
