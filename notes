@@ -1,0 +1,18 @@
+https://github.com/ndrplz/ConvLSTM_pytorch
+https://github.com/karanchawla/Monocular-Visual-Inertial-Odometry/blob/master/VO/visual_odometry.py
+https://github.com/HKUST-Aerial-Robotics/VINS-Mono
+https://github.com/rpng/R-VIO
+https://github.com/Sachini/niloc
+
+(x,y,z) are all relative depending on starting condition. Deltas remain general over all imagaes taken from same camera placement.
+Quaternions are general for one camera orientation.
+
+Integration of camera params could help generalize ?
+
+Td = T0**(-1) T1 could only take deltas of (x,y,z) and include those into loss function seperately
+the orientation could be mapped directly from the images, even from single instance. : )
+so the total loss function would be:
+
+loss = norm(1 - norm(q)) + norm(gt_q - q) + norm(gt_dt - dt)
+
+Could use padding to input variable length events ? or imu data..
