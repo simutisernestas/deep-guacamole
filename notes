@@ -16,3 +16,6 @@ so the total loss function would be:
 loss = norm(1 - norm(q)) + norm(gt_q - q) + norm(gt_dt - dt)
 
 Could use padding to input variable length events ? or imu data..
+
+IMU transformer integration
+https://www.cs.princeton.edu/~rl27/assets/img/iw_poster.pdf
