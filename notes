@@ -16,3 +16,9 @@ so the total loss function would be:
 loss = norm(1 - norm(q)) + norm(gt_q - q) + norm(gt_dt - dt)
 
 Could use padding to input variable length events ? or imu data..
+
+IMU transformer integration
+https://www.cs.princeton.edu/~rl27/assets/img/iw_poster.pdf
+
+Could be interesting to compare raw IMU with gtsam : )
+https://github.com/shrubb/offline-vi-3d-reconstruction/blob/master/optimize_IMU_only.py
