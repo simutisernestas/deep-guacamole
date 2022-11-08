@@ -22,3 +22,8 @@ https://www.cs.princeton.edu/~rl27/assets/img/iw_poster.pdf
 
 Could be interesting to compare raw IMU with gtsam : )
 https://github.com/shrubb/offline-vi-3d-reconstruction/blob/master/optimize_IMU_only.py
+
+seems like increasing the transformer size on events doesn't improve the performance at all
+patch size ?
+only dim ?
+only mlp size ?
