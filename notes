@@ -27,3 +27,9 @@ seems like increasing the transformer size on events doesn't improve the perform
 patch size ?
 only dim ?
 only mlp size ?
+
+
+
+(label - mean) / std = N
+label - mean = N * std
+label = (N * std) + mean
