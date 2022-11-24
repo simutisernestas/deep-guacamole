@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import os
 from torch.utils.data import Dataset
+import math
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 mc = 350  # 345 is max dim, of binned event image
@@ -108,7 +109,7 @@ class EventDataset(Dataset):
         finish = self.labels_df.iloc[idx+self.delta]["events_start_idx"]
 
         if self.bins > 1:
-            num_per_bin = int((finish-start)/self.bins)
+            num_per_bin = math.floor((finish-start)/self.bins)
             binned_events = torch.zeros((self.bins, mc, mc))
             for b in range(self.bins):
                 start_bin = int(start)+b*num_per_bin

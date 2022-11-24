@@ -1,32 +1,39 @@
 #!/usr/bin/env python3
+import sys
 from network import ImuEventModel
 from datasets import EventDataset, CombinedDataset
 from torch.utils.data import DataLoader
 import torch
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-import sys
 
 if len(sys.argv) != 4:
     print("Provide checkpoint and LR!")
     exit()
 
-delta = 10
-event_bins = 1
-data_dir = "indoor_forward_9_davis_with_gt"
-LABEL_NORM_MEAN = 0.0 #0.14
-LABEL_NORM_STD = 1.0 #0.35
-vio_dataset_1 = EventDataset(
-    data_dir, delta, event_bins,
-    mean=LABEL_NORM_MEAN, std=LABEL_NORM_STD)
-data_dir = "indoor_forward_3_davis_with_gt"
-vio_dataset_2 = EventDataset(
-    data_dir, delta, event_bins,
-    mean=LABEL_NORM_MEAN, std=LABEL_NORM_STD)
-combined_dataset = CombinedDataset([vio_dataset_1, vio_dataset_2])
+LABEL_NORM_MEAN = 0.0  # 0.14
+LABEL_NORM_STD = 1.0  # 0.35
+delta = 32  # TODO: changed : )
+event_bins = 1  # TODO: THERE IS A BUG WITH MULTIPLE BINS! AT RUNTIME DATALOADER FAILS
+
+# process directories
+data_dirs = [
+    "indoor_forward_9_davis_with_gt",
+    "indoor_forward_3_davis_with_gt",
+    "indoor_forward_7_davis_with_gt"
+]
+datasets = []
+for data_dir in data_dirs:
+    vio_dataset = EventDataset(
+        data_dir, delta, event_bins,
+        mean=LABEL_NORM_MEAN, std=LABEL_NORM_STD)
+    datasets.append(vio_dataset)
+
+# combine into single dataset
+combined_dataset = CombinedDataset(datasets)
 combined_dataloader = DataLoader(
     combined_dataset, batch_size=int(sys.argv[3]), shuffle=True, num_workers=16)
 
-transformer_out_features = 32
+transformer_out_features = 128  # TODO: changed : )
 model = ImuEventModel(transformer_out_features, event_bins)
 CHECKPOINT = sys.argv[1]
 if CHECKPOINT != "":
@@ -77,7 +84,7 @@ for epoch in range(num_epochs):
                 # statistics
                 running_loss += loss.item() * batch["imu"].size(0)
 
-        epoch_loss = running_loss / (len(vio_dataset_1)+len(vio_dataset_2))
+        epoch_loss = running_loss / sum([len(d) for d in datasets])
         print(f'{phase} Loss: {epoch_loss:.8f}')
 
         if epoch_loss < best_epoch_loss:

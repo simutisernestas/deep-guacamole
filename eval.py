@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import matplotlib.pyplot as plt
 import transforms3d.quaternions as tfq
 import numpy as np
@@ -7,14 +8,14 @@ from torch.utils.data import DataLoader
 import torch
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-delta = 10
+delta = 32
 event_bins = 1
 data_dir = "indoor_forward_9_davis_with_gt"
 vio_dataset = EventDataset(data_dir, delta, event_bins)
 
-transformer_out_features = 32
+transformer_out_features = 128
 model = ImuEventModel(transformer_out_features, event_bins)
-model.load_state_dict(torch.load("data/event_model_0.010282640582092873.pt"))
+model.load_state_dict(torch.load("data/event_model.pt"))
 model.to(device)
 model.eval()
 
@@ -26,8 +27,8 @@ gtx = np.zeros((3, 1))
 # revert back the labels with this
 q0 = vio_dataset.labels_df.loc[0, "qw":"qz"].to_numpy()
 
-means = 0.14081615209579468
-stds = 0.35239288210868835
+means = 0.0
+stds = 1.0
 
 for i in range(int(len(vio_dataset)/delta)):
     data_point = vio_dataset.__getitem__(i*delta)

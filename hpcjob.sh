@@ -31,9 +31,9 @@
 nvidia-smi
 module swap cuda/11.5
 module load cudnn/v8.3.2.44-prod-cuda-11.5
-/appl/cuda/11.6.0/samples/bin/x86_64/linux/release/deviceQuery
+/appl/cuda/11.5.0/samples/bin/x86_64/linux/release/deviceQuery
 module load python3/3.7.14
 
 # run
 cd deep-guacamole
-./train.py data/event_model_4.pt 0.001 1024
+./train.py data/event_model.pt 0.001 1024
