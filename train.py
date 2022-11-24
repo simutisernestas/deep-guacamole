@@ -24,7 +24,7 @@ vio_dataset_2 = EventDataset(
     mean=LABEL_NORM_MEAN, std=LABEL_NORM_STD)
 combined_dataset = CombinedDataset([vio_dataset_1, vio_dataset_2])
 combined_dataloader = DataLoader(
-    combined_dataset, batch_size=int(sys.argv[3]), shuffle=True, num_workers=6)
+    combined_dataset, batch_size=int(sys.argv[3]), shuffle=True, num_workers=16)
 
 transformer_out_features = 32
 model = ImuEventModel(transformer_out_features, event_bins)
@@ -81,7 +81,7 @@ for epoch in range(num_epochs):
         print(f'{phase} Loss: {epoch_loss:.8f}')
 
         if epoch_loss < best_epoch_loss:
-            torch.save(model.state_dict(), f"data/event_model_{epoch}.pt")
+            torch.save(model.state_dict(), f"data/event_model.pt")
             best_epoch_loss = epoch_loss
 
     scheduler.step()
