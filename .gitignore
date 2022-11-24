@@ -1,2 +1,4 @@
 **/__pycache__
 indoor*
+data/event_*
+*.png
