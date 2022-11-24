@@ -4,6 +4,11 @@ from datasets import EventDataset, CombinedDataset
 from torch.utils.data import DataLoader
 import torch
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+import sys
+
+if len(sys.argv) != 3:
+    print("Provide checkpoint and LR!")
+    exit()
 
 delta = 10
 event_bins = 1
@@ -25,12 +30,12 @@ combined_dataloader = DataLoader(
 
 transformer_out_features = 32
 model = ImuEventModel(transformer_out_features, event_bins)
-CHECKPOINT = ""
+CHECKPOINT = sys.argv[1]
 if CHECKPOINT != "":
     model.load_state_dict(torch.load(CHECKPOINT))
 model.to(device)
 criterion = torch.nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+optimizer = torch.optim.Adam(model.parameters(), lr=float(sys.argv[2]))
 scheduler = torch.optim.lr_scheduler.MultiStepLR(
     optimizer, milestones=[100, 150], gamma=.5)
 # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
