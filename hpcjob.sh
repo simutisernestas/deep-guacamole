@@ -36,4 +36,4 @@ module load python3/3.7.14
 python3 -m pip install --user \ 
     --extra-index-url https://download.pytorch.org/whl/cu116 \
     torch torchvision torchaudio numpy jupyterlab matplotlib \
-    pandas transforms3d pyquaternion
+    pandas transforms3d pyquaternion vit-pytorch

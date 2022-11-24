@@ -1,4 +1,4 @@
-#!/opt/conda/bin/python
+#!/usr/bin/env python3
 from network import ImuEventModel
 from datasets import EventDataset, CombinedDataset
 from torch.utils.data import DataLoader

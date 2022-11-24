@@ -45,8 +45,6 @@ class EventDataset(Dataset):
             labels_df = labels_df.reindex(columns=columns_titles)
             labels_df["events_start_idx"] = 0
             self.labels_df = labels_df
-            self.labels_df["timestamp"] = pd.to_datetime(
-                self.labels_df["timestamp"], unit='s')
             labels_df_nostamp = labels_df.loc[:,
                                               labels_df.columns != 'timestamp']
             labels_df_nostamp = labels_df_nostamp.loc[:,
@@ -89,6 +87,8 @@ class EventDataset(Dataset):
 
             # save for easy loading
             self.labels_df.to_pickle(indexed_labels_pickle)
+            self.labels_df["timestamp"] = pd.to_datetime(
+                self.labels_df["timestamp"], unit='s')
 
         self.labels = torch.tensor(
             self.labels_df.loc[:, 'dtx':'dqz'].to_numpy(), dtype=torch.float32)

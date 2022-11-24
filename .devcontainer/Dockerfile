@@ -12,4 +12,4 @@ RUN apt-get update \
 ENV DEBIAN_FRONTEND=dialog
 
 RUN pip3 install numpy jupyterlab matplotlib \
-   pandas transforms3d pyquaternion
+   pandas transforms3d pyquaternion vit-pytorch
