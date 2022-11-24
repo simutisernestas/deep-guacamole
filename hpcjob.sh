@@ -28,7 +28,12 @@
 # -- end of LSF options --
 
 nvidia-smi
-module load cuda/11.6
+module swap cuda/11.5
+module load cudnn/v8.3.2.44-prod-cuda-11.5
 /appl/cuda/11.6.0/samples/bin/x86_64/linux/release/deviceQuery
+
 module load python3/3.7.14
-python3 -m pip install --extra-index-url https://download.pytorch.org/whl/cu116 --user torch torchvision torchaudio
+python3 -m pip install --user \ 
+    --extra-index-url https://download.pytorch.org/whl/cu116 \
+    torch torchvision torchaudio numpy jupyterlab matplotlib \
+    pandas transforms3d pyquaternion

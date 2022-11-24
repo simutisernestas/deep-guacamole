@@ -11,7 +11,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 mc = 350  # 345 is max dim, of binned event image
 
 class EventDataset(Dataset):
-    def __init__(self, data_dir, label_delta_len, event_bins, mean=0.1425691694021225, std=0.3528788089752197):
+    def __init__(self, data_dir, label_delta_len, event_bins, mean=0.0, std=1.0):
         imu_cols = ["timestamp", "ang_vel_x", "ang_vel_y",
                     "ang_vel_z", "lin_acc_x", "lin_acc_y", "lin_acc_z"]
         self.imu_df = pd.read_csv(os.path.join(

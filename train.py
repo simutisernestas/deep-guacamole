@@ -8,8 +8,8 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 delta = 10
 event_bins = 1
 data_dir = "indoor_forward_9_davis_with_gt"
-LABEL_NORM_MEAN = 0.14
-LABEL_NORM_STD = 0.35
+LABEL_NORM_MEAN = 0.0 #0.14
+LABEL_NORM_STD = 1.0 #0.35
 vio_dataset_1 = EventDataset(
     data_dir, delta, event_bins,
     mean=LABEL_NORM_MEAN, std=LABEL_NORM_STD)
@@ -25,13 +25,14 @@ combined_dataloader = DataLoader(
 
 transformer_out_features = 32
 model = ImuEventModel(transformer_out_features, event_bins)
-CHECKPOINT = "data/event_model_3.pt"
-model.load_state_dict(torch.load(CHECKPOINT))
+CHECKPOINT = ""
+if CHECKPOINT != "":
+    model.load_state_dict(torch.load(CHECKPOINT))
 model.to(device)
 criterion = torch.nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 scheduler = torch.optim.lr_scheduler.MultiStepLR(
-    optimizer, milestones=[5, 10, 20, 40, 60, 80, 100, 150], gamma=.5)
+    optimizer, milestones=[100, 150], gamma=.5)
 # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
 #     optimizer, factor=.5, patience=2, threshold=0.01)
 
