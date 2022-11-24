@@ -6,7 +6,7 @@ import torch
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 import sys
 
-if len(sys.argv) != 3:
+if len(sys.argv) != 4:
     print("Provide checkpoint and LR!")
     exit()
 
@@ -18,15 +18,13 @@ LABEL_NORM_STD = 1.0 #0.35
 vio_dataset_1 = EventDataset(
     data_dir, delta, event_bins,
     mean=LABEL_NORM_MEAN, std=LABEL_NORM_STD)
-# dataloader_1 = DataLoader(vio_dataset_1, batch_size=100, shuffle=True, num_workers=4)
 data_dir = "indoor_forward_3_davis_with_gt"
 vio_dataset_2 = EventDataset(
     data_dir, delta, event_bins,
     mean=LABEL_NORM_MEAN, std=LABEL_NORM_STD)
-# dataloader_2 = DataLoader(vio_dataset_2, batch_size=100, shuffle=True, num_workers=4)
 combined_dataset = CombinedDataset([vio_dataset_1, vio_dataset_2])
 combined_dataloader = DataLoader(
-    combined_dataset, batch_size=100, shuffle=True, num_workers=6)
+    combined_dataset, batch_size=int(sys.argv[3]), shuffle=True, num_workers=6)
 
 transformer_out_features = 32
 model = ImuEventModel(transformer_out_features, event_bins)
