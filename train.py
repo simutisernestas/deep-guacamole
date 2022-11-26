@@ -5,21 +5,20 @@ from datasets import EventDataset, CombinedDataset
 from torch.utils.data import DataLoader
 import torch
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+from constants import * 
 
 if len(sys.argv) != 4:
-    print("Provide checkpoint and LR!")
+    print("Required arguments checkpoint, LR, batch_size")
     exit()
-
-LABEL_NORM_MEAN = 0.0  # 0.14
-LABEL_NORM_STD = 1.0  # 0.35
-delta = 32  # TODO: changed : )
-event_bins = 1  # TODO: THERE IS A BUG WITH MULTIPLE BINS! AT RUNTIME DATALOADER FAILS
 
 # process directories
 data_dirs = [
     "indoor_forward_9_davis_with_gt",
     "indoor_forward_3_davis_with_gt",
-    "indoor_forward_7_davis_with_gt"
+    "indoor_forward_7_davis_with_gt",
+    "indoor_forward_5_davis_with_gt",
+    "indoor_forward_6_davis_with_gt",
+    "indoor_forward_10_davis_with_gt",
 ]
 datasets = []
 for data_dir in data_dirs:
@@ -33,7 +32,6 @@ combined_dataset = CombinedDataset(datasets)
 combined_dataloader = DataLoader(
     combined_dataset, batch_size=int(sys.argv[3]), shuffle=True, num_workers=16)
 
-transformer_out_features = 128  # TODO: changed : )
 model = ImuEventModel(transformer_out_features, event_bins)
 CHECKPOINT = sys.argv[1]
 if CHECKPOINT != "":

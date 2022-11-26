@@ -1,3 +1,4 @@
+from constants import *
 import torch.nn.functional as F
 import transforms3d.quaternions as tfq
 import transforms3d as tf
@@ -9,7 +10,6 @@ from torch.utils.data import Dataset
 import math
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-mc = 350  # 345 is max dim, of binned event image
 
 class EventDataset(Dataset):
     def __init__(self, data_dir, label_delta_len, event_bins, mean=0.0, std=1.0):
@@ -93,20 +93,24 @@ class EventDataset(Dataset):
 
         self.labels = torch.tensor(
             self.labels_df.loc[:, 'dtx':'dqz'].to_numpy(), dtype=torch.float32)
-        print(f"mean = {mean}\nstds = {std}")
+        print(f"Loaded: {data_dir}")
+        # print(f"mean = {mean}\nstds = {std}")
         self.labels = (self.labels - mean) / std
 
         self.delta = label_delta_len
         self.bins = event_bins
 
     def __len__(self):
-        return self.labels.shape[0] - self.delta
+        return math.floor((self.labels.shape[0] - self.delta) / self.delta)
 
     def __getitem__(self, idx):
-        dpose = self.labels[idx+self.delta]
+        start_idx = idx * self.delta
+        end_idx = start_idx + self.delta
 
-        start = self.labels_df.iloc[idx]["events_start_idx"]
-        finish = self.labels_df.iloc[idx+self.delta]["events_start_idx"]
+        dpose = self.labels[end_idx]
+
+        start = self.labels_df.iloc[start_idx]["events_start_idx"]
+        finish = self.labels_df.iloc[end_idx]["events_start_idx"]
 
         if self.bins > 1:
             num_per_bin = math.floor((finish-start)/self.bins)
@@ -126,9 +130,9 @@ class EventDataset(Dataset):
                 events[:, 2].type(torch.FloatTensor) - .5), accumulate=True)
 
         imu_index_start = self.imu_df.index.get_loc(
-            self.labels_df.iloc[idx]["timestamp"], method='nearest')
+            self.labels_df.iloc[start_idx]["timestamp"], method='nearest')
         imu_index_end = self.imu_df.index.get_loc(
-            self.labels_df.iloc[idx+self.delta]["timestamp"], method='nearest')
+            self.labels_df.iloc[end_idx]["timestamp"], method='nearest')
         imu = self.imu_data[imu_index_start:imu_index_end]
 
         p1d = (0, 0, self.delta*3-imu.shape[0], 0)
@@ -145,18 +149,15 @@ class EventDataset(Dataset):
 class CombinedDataset(Dataset):
     def __init__(self, datasets):
         self.datasets = datasets
-        
+
     def __getitem__(self, index):
-        ret = []
-        for dataset in self.datasets:
-            ret.append(dataset[index % len(dataset)])
-        return tuple(ret)
-    
+        try:  # TODO: fails on overlapping sequences : )
+            ret = []
+            for dataset in self.datasets:
+                ret.append(dataset[index % len(dataset)])
+            return tuple(ret)
+        except Exception as ex:
+            print(f"here : ) {ex}")
+
     def __len__(self):
         return sum([len(x) for x in self.datasets])
-
-# dataset = MyDataset()
-# print(len(dataset))
-# loader = DataLoader(dataset, batch_size=2)
-# for idx, (a, b) in enumerate(loader):
-#     print("iter {}\na {}\nb {}".format(idx, a, b))
