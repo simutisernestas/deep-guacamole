@@ -68,7 +68,7 @@ class EventDataset(Dataset):
                                int(1e4)]["timestamp"].sub(label_ts).abs().idxmin()
                 self.labels_df["events_start_idx"][i] = id
                 first_id = id
-                if i % 1000 == 0:
+                if i % 1000 == 0 and i != 0:
                     print(i)
 
                 dpose = np.zeros(7, dtype=np.float64)
@@ -79,9 +79,23 @@ class EventDataset(Dataset):
                 dpose[:3] = dl
                 q1 = tfq.qmult(l1[3:], q0inv)  # [[3,0,1,2]]
                 q2 = tfq.qmult(l2[3:], q0inv)  # [[3,0,1,2]]
+                # q_b = q_diff * q_a
+                # q_b * inv(q_a) = q_diff * q_a * inv(q_a)
+                # q_b * inv(q_a) = q_diff
                 dq = tf.quaternions.qmult(
                     q2, tf.quaternions.qinverse(q1))  # orientation delta
                 dpose[3:] = dq  # pose delta is the label
+
+                # dpose = np.zeros(7, dtype=np.float64)
+                # l1 = labels[i]
+                # l2 = labels[i+label_delta_len]
+                # dl = l2[:3] - l1[:3]
+                # dpose[:3] = dl
+                # q1 = l1[3:]  # [[3,0,1,2]]
+                # q2 = l2[3:]  # [[3,0,1,2]]
+                # dq = tf.quaternions.qmult(
+                #     q1, tf.quaternions.qinverse(q2))  # orientation delta
+                # dpose[3:] = dq  # pose delta is the label
 
                 for col_index, col in enumerate(new_cols):
                     self.labels_df[col][i+label_delta_len] = dpose[col_index]
@@ -101,10 +115,10 @@ class EventDataset(Dataset):
         self.bins = event_bins
 
     def __len__(self):
-        return math.floor((self.labels.shape[0] - self.delta) / self.delta)
+        return math.floor((self.labels.shape[0] - self.delta))  # / self.delta
 
     def __getitem__(self, idx):
-        start_idx = idx * self.delta
+        start_idx = idx  # * self.delta
         end_idx = start_idx + self.delta
 
         dpose = self.labels[end_idx]
@@ -135,7 +149,7 @@ class EventDataset(Dataset):
             self.labels_df.iloc[end_idx]["timestamp"], method='nearest')
         imu = self.imu_data[imu_index_start:imu_index_end]
 
-        p1d = (0, 0, self.delta*3-imu.shape[0], 0)
+        p1d = (0, 0, 65-imu.shape[0], 0)
         imu = F.pad(imu, p1d, "constant", 0)
 
         sample = {"events": binned_events, "imu": imu, "label": dpose}
@@ -151,7 +165,7 @@ class CombinedDataset(Dataset):
         self.datasets = datasets
 
     def __getitem__(self, index):
-        try:  # TODO: fails on overlapping sequences : )
+        try:
             ret = []
             for dataset in self.datasets:
                 ret.append(dataset[index % len(dataset)])
@@ -160,4 +174,4 @@ class CombinedDataset(Dataset):
             print(f"here : ) {ex}")
 
     def __len__(self):
-        return sum([len(x) for x in self.datasets])
+        return min([len(x) for x in self.datasets])

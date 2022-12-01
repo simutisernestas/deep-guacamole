@@ -33,10 +33,12 @@ class ImuEventModel(torch.nn.Module):
             emb_dropout = 0.0,
             channels=event_bins
         )
-        self.imu_tf = IMUTransformer(out_features)
-        self.linear1 = torch.nn.Linear(out_features*2, out_features*2)
+        imu_out = int(out_features/2)
+        self.imu_tf = IMUTransformer(imu_out)
+        ll_dim = imu_out + out_features
+        self.linear1 = torch.nn.Linear(ll_dim, ll_dim)
         self.activation = torch.nn.ReLU()
-        self.linear2 = torch.nn.Linear(out_features*2, 7)
+        self.linear2 = torch.nn.Linear(ll_dim, 7)
 
     def forward(self, x):
         # let's say x is tuple

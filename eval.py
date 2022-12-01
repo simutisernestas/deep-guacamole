@@ -24,13 +24,15 @@ gtx = np.zeros((3, 1))
 # revert back the labels with this
 q0 = vio_dataset.labels_df.loc[0, "qw":"qz"].to_numpy()
 
-for i in range(len(vio_dataset)):
-    data_point = vio_dataset[i]
+# for i in range(len(vio_dataset)):
+for i in range(int(len(vio_dataset)/delta)):
+    data_point = vio_dataset[i*delta]
 
     delta_label = data_point["label"].numpy().reshape(7, 1)[:3]
     rotated = tfq.rotate_vector(
         (delta_label * LABEL_NORM_STD + LABEL_NORM_MEAN).reshape((3,)), q0)
     gtx += rotated.reshape((3, 1))
+    # gtx += delta_label.reshape((3, 1))
     ground.append(gtx.copy())
 
     inputs = (data_point["events"].unsqueeze(0).to(device),
@@ -40,6 +42,7 @@ for i in range(len(vio_dataset)):
     xpred_rot = tfq.rotate_vector(
         (dx * LABEL_NORM_STD + LABEL_NORM_MEAN).reshape((3,)), q0)
     x += xpred_rot.reshape((3, 1))
+    # x += dx.reshape((3, 1))
     path.append(x.copy())
 
 path = np.array(path).reshape(-1, 3)
