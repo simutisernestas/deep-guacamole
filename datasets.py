@@ -8,6 +8,7 @@ import numpy as np
 import os
 from torch.utils.data import Dataset
 import math
+from constants import *
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
@@ -115,7 +116,8 @@ class EventDataset(Dataset):
         self.bins = event_bins
 
     def __len__(self):
-        return math.floor((self.labels.shape[0] - self.delta))  # / self.delta
+        actual_len = math.floor((self.labels.shape[0] - self.delta))
+        return actual_len #- (actual_len % BATCH_SIZE)  # / self.delta
 
     def __getitem__(self, idx):
         start_idx = idx  # * self.delta
@@ -165,13 +167,10 @@ class CombinedDataset(Dataset):
         self.datasets = datasets
 
     def __getitem__(self, index):
-        try:
-            ret = []
-            for dataset in self.datasets:
-                ret.append(dataset[index % len(dataset)])
-            return tuple(ret)
-        except Exception as ex:
-            print(f"here : ) {ex}")
+        ret = []
+        for dataset in self.datasets:
+            ret.append(dataset[index % len(dataset)])
+        return tuple(ret)
 
     def __len__(self):
-        return min([len(x) for x in self.datasets])
+        return max([len(x) for x in self.datasets])

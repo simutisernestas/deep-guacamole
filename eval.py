@@ -7,7 +7,7 @@ from network import ImuEventModel
 from datasets import EventDataset
 from torch.utils.data import DataLoader
 import torch
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
 data_dir = "indoor_forward_3_davis_with_gt"
 vio_dataset = EventDataset(data_dir, delta, event_bins)

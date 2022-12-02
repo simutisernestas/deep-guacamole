@@ -7,8 +7,8 @@ from torch.utils.data import DataLoader
 import torch
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-if len(sys.argv) != 4:
-    print("Required arguments checkpoint, LR, batch_size")
+if len(sys.argv) != 3:
+    print("Required arguments checkpoint, LR")
     exit()
 
 # process directories
@@ -27,7 +27,6 @@ for data_dir in data_dirs:
         mean=LABEL_NORM_MEAN, std=LABEL_NORM_STD)
     datasets.append(vio_dataset)
 
-BATCH_SIZE = int(sys.argv[3])
 # dataloaders = []
 # for dataset in datasets:
 #     loader = DataLoader(
@@ -37,7 +36,8 @@ BATCH_SIZE = int(sys.argv[3])
 # # combine into single dataset
 combined_dataset = CombinedDataset(datasets)
 combined_dataloader = DataLoader(
-    combined_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=16)
+    combined_dataset, batch_size=BATCH_SIZE, 
+    shuffle=True, num_workers=16, drop_last=True)
 
 model = ImuEventModel(transformer_out_features, event_bins)
 CHECKPOINT = sys.argv[1]
