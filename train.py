@@ -13,12 +13,12 @@ if len(sys.argv) != 3:
 
 # process directories
 data_dirs = [
-    "indoor_forward_9_davis_with_gt",
     "indoor_forward_3_davis_with_gt",
-    "indoor_forward_7_davis_with_gt",
     "indoor_forward_5_davis_with_gt",
     "indoor_forward_6_davis_with_gt",
-    "indoor_forward_10_davis_with_gt",
+    "indoor_forward_7_davis_with_gt",
+    "indoor_forward_9_davis_with_gt",
+    # "indoor_forward_10_davis_with_gt", this will be used for validation
 ]
 datasets = []
 for data_dir in data_dirs:

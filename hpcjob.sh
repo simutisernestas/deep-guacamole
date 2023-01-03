@@ -35,5 +35,5 @@ module load cudnn/v8.3.2.44-prod-cuda-11.5
 module load python3/3.7.14
 
 # run
-cd deep-guacamole
-./train.py data/event_model.pt 0.001 1024
+# cd deep-guacamole
+# ./train.py data/event_model.pt 0.001 1024

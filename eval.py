@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 import torch
 device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
-data_dir = "indoor_forward_3_davis_with_gt"
+data_dir = "indoor_forward_10_davis_with_gt"
 vio_dataset = EventDataset(data_dir, delta, event_bins)
 
 model = ImuEventModel(transformer_out_features, event_bins)
@@ -24,9 +24,13 @@ gtx = np.zeros((3, 1))
 # revert back the labels with this
 q0 = vio_dataset.labels_df.loc[0, "qw":"qz"].to_numpy()
 
+stamps = []
+
 # for i in range(len(vio_dataset)):
 for i in range(int(len(vio_dataset)/delta)):
     data_point = vio_dataset[i*delta]
+
+    stamps.append(vio_dataset.labels_df.loc[i*delta, "timestamp"].timestamp())
 
     delta_label = data_point["label"].numpy().reshape(7, 1)[:3]
     rotated = tfq.rotate_vector(
@@ -47,6 +51,9 @@ for i in range(int(len(vio_dataset)/delta)):
 
 path = np.array(path).reshape(-1, 3)
 ground = np.array(ground).reshape(-1, 3)
+stamps = np.array(stamps).reshape(-1, 1)
+
+np.savetxt("foo.csv", np.concatenate((stamps, path), axis=1), delimiter=",")
 
 fig = plt.figure(dpi=200)
 ax = plt.axes(projection='3d')
